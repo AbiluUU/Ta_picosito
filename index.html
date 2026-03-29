@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="logo-area">
+    <img src="img/image.png" alt="logo">
+    <div class="brand-name">Ta' Picosito</div>
+    <div class="brand-tagline">¡Picante y Delicioso!</div>
+  </div>
+</div>
+
+<!-- LOCATION BAR -->
+<div class="location-bar">
+  <span class="location-text">📍 Piura, Perú</span>
+  <a href="https://maps.app.goo.gl/TUv4Zi2CK13sKtrg7" target="_blank" class="maps-btn">
+    🗺️ Abrir en Google Maps
+  </a>
+</div>
+
+<!-- TABS -->
+<div class="nav-tabs">
+  <button class="tab-btn active" onclick="showTab('elotes')">🌽 Elotes</button>
+  <button class="tab-btn" onclick="showTab('botanas')">🍟 Botanas</button>
+  <button class="tab-btn" onclick="showTab('frutas')">🍓 Frutas</button>
+  <button class="tab-btn" onclick="showTab('extras')">➕ Adicionales</button>
+</div>
+
+<!-- SECTION: ELOTES -->
+<div class="menu-section active" id="sec-elotes">
+  <p class="section-title">🌽 Elotes & Especialidades</p>
+  <div class="menu-grid" id="grid-elotes"></div>
+</div>
+
+<!-- SECTION: BOTANAS -->
+<div class="menu-section" id="sec-botanas">
+  <p class="section-title">🔥 Botanas Locas</p>
+  <div class="menu-grid" id="grid-botanas"></div>
+</div>
+
+<!-- SECTION: FRUTAS -->
+<div class="menu-section" id="sec-frutas">
+  <p class="section-title">🍓 Frutas & Dulces</p>
+  <div class="menu-grid" id="grid-frutas"></div>
+</div>
+
+<!-- SECTION: EXTRAS -->
+<div class="menu-section" id="sec-extras">
+  <p class="section-title">➕ Adicionales</p>
+  <div class="addons-grid" id="grid-extras"></div>
+  <br>
+  <p class="section-title">🥣 Cremas</p>
+  <div class="cremas-list">
+    <span class="crema-tag">🥄 Mayonesa</span>
+    <span class="crema-tag">🌶️ Mayonesa Chipotle</span>
+    <span class="crema-tag">🥑 Guacamole</span>
+    <span class="crema-tag">🧀 Crema Cheddar</span>
+  </div>
+  <br>
+  <p class="section-title">🫙 Salsas</p>
+  <div class="cremas-list">
+    <span class="crema-tag">🔴 Valentina</span>
+    <span class="crema-tag">🟠 Valentina Salsa Picante</span>
+    <span class="crema-tag">🟡 Tajín</span>
+    <span class="crema-tag">🔵 Salsa #3</span>
+  </div>
+</div>
+
+<!-- CART FAB -->
+<div class="cart-fab">
+  <a href="#" class="whatsapp-fab" onclick="openWhatsApp(event)" title="WhatsApp">💬</a>
+  <button class="cart-btn" onclick="openCart()">
+    🛒 Mi Pedido <span class="cart-badge" id="cart-count">0</span>
+  </button>
+</div>
+
+<!-- CART OVERLAY -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCartOut(event)">
+  <div class="cart-panel">
+    <div class="cart-head">
+      <span class="cart-head-title">🛒 Mi Pedido</span>
+      <button class="close-cart" onclick="closeCart()">✕</button>
+    </div>
+    <div class="cart-items" id="cart-items">
+      <div class="cart-empty">¡Tu carrito está vacío!<br>Agrega algo delicioso 🌶️</div>
+    </div>
+    <div class="cart-total-row">
+      <span class="cart-total-label">Total:</span>
+      <span class="cart-total-val" id="cart-total">S/0.00</span>
+    </div>
+    <div class="cart-actions">
+      <a href="#" id="wa-delivery-btn" class="wa-order-btn" onclick="sendWhatsApp('delivery', event)">
+        📦 Pedir Delivery por WhatsApp
+      </a>
+      <a href="#" class="wa-info-btn" onclick="sendWhatsApp('info', event)">
+        ℹ️ Consultar Información por WhatsApp
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const PHONE = '51923284733'; // El número real
+
+const menuData = {
+  elotes: [
+    { id: 1, name: 'Elote XL', price: 14, emoji: '🌽', desc: 'Queso rallado, carne desmechada, elote cubierto con capa de doritos y mantequilla', extra: '+ Cheetos Flamin Hot o + Cheese Tris' },
+    { id: 2, name: 'Elotito', price: 9, emoji: '🌽', desc: 'Elote cubierto de mantequilla, mayonesa, capa de Doritos o Cheetos Flamin Hot' },
+    { id: 3, name: 'Esquites', price: 16, emoji: '🥣', desc: 'Doritos, elote desgranado, queso rallado y capa de doritos molidos' },
+    { id: 4, name: 'Taki Locos', price: 19, emoji: '🔥', desc: 'Elote desgranado, lechuga, pepinillo, queso rallado, carne molida y cueritos de chancho' },
+    { id: 5, name: 'Dori Locos Especial', price: 22, emoji: '🌶️', desc: 'Elote desgranado, lechuga, pepinillo, queso rallado, carne molida y cueritos de chancho Y chorizo picante' },
+    { id: 6, name: 'Volcán Picosito', price: 25, emoji: '🌋', desc: 'Sopa instantánea, mantequilla, elote desgranado, queso rallado, carne desmechada servido en plato', extra: '+ Doritos a elegir' },
+  ],
+  botanas: [
+    { id: 7, name: 'Nachos Hot', price: 21, emoji: '🧀', desc: 'Elote desgranado, nachos, carne molida, chorizo picante y queso rallado' },
+    { id: 8, name: 'Cheetos Loco', price: 20, emoji: '🔥', desc: 'Cheetos Flamin Hot, elote desgranado, chorizo picante, queso rallado, crema de queso cheddar' },
+    { id: 9, name: 'Papa Loca', price: 22, emoji: '🥔', desc: 'Elote desgranado, lechuga, pepinillo, queso rallado, carne molida, cuerito, chorizo picante' },
+  ],
+  frutas: [
+    { id: 10, name: 'Gomitas Picositas', price: 10, emoji: '🍬', desc: 'Gomitas + Chamoy + Salsa Valentina + Grajeas + Miguelito de mango + Miguelito clásico' },
+    { id: 11, name: 'Frutas Locas (Piña+Mango)', price: 18, emoji: '🍍', desc: 'Piña + Mango + Gomitas + Chamoy + Salsa Valentina + Grajeas + Miguelito de mango + Miguelito clásico' },
+    { id: 12, name: 'Frutas Locas Full Mango', price: 20, emoji: '🥭', desc: 'Full mango + Gomitas + Chamoy + Salsa Valentina + Grajeas + Miguelito de mango + Miguelito clásico' },
+    { id: 13, name: 'Minifrutas Locas', price: 10, emoji: '🍓', desc: 'Fruta + Gomitas + Chamoy + Salsa Valentina + Grajeas + Miguelito de mango + Miguelito clásico' },
+  ],
+};
+
+const addons = [
+  { name: 'Chorizo picante', price: 4 },
+  { name: 'Cuerito', price: 4 },
+  { name: 'Carne desmechada', price: 4 },
+  { name: 'Carne molida', price: 4 },
+  { name: 'Elote desgranado', price: 3 },
+];
+
+let cart = {};
+let quantities = {};
+
+function buildMenuGrid(section) {
+  const items = menuData[section];
+  const grid = document.getElementById('grid-' + section);
+  grid.innerHTML = items.map(item => `
+    <div class="menu-card" id="card-${item.id}">
+      <div class="card-header">
+        <span class="card-emoji">${item.emoji}</span>
+        <div class="card-info">
+          <div class="card-name">${item.name}</div>
+        </div>
+        <span class="card-price">S/${item.price}.00</span>
+      </div>
+      <div class="card-desc">${item.desc}</div>
+      ${item.extra ? `<div class="card-extras">${item.extra}</div>` : ''}
+      <div class="card-footer">
+        <div class="qty-control">
+          <button class="qty-btn" onclick="changeQty(${item.id}, -1)">−</button>
+          <span class="qty-num" id="qty-${item.id}">1</span>
+          <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
+        </div>
+        <button class="add-cart-btn" id="btn-${item.id}" onclick="addToCart(${item.id}, '${item.name}', ${item.price})">
+          🛒 Agregar
+        </button>
+      </div>
+    </div>
+  `).join('');
+  items.forEach(i => { quantities[i.id] = 1; });
+}
+
+function buildAddons() {
+  const grid = document.getElementById('grid-extras');
+  grid.innerHTML = addons.map(a => `
+    <div class="addon-card">
+      <span class="addon-name">➕ ${a.name}</span>
+      <span class="addon-price">S/${a.price}.00</span>
+    </div>
+  `).join('');
+}
+
+function changeQty(id, delta) {
+  quantities[id] = Math.max(1, (quantities[id] || 1) + delta);
+  document.getElementById('qty-' + id).textContent = quantities[id];
+}
+
+function addToCart(id, name, price) {
+  const qty = quantities[id] || 1;
+  if (cart[id]) {
+    cart[id].qty += qty;
+  } else {
+    cart[id] = { name, price, qty };
+  }
+  updateCartUI();
+  const btn = document.getElementById('btn-' + id);
+  btn.textContent = '✅ Agregado';
+  btn.classList.add('added');
+  setTimeout(() => {
+    btn.textContent = '🛒 Agregar';
+    btn.classList.remove('added');
+  }, 1200);
+  showToast(`${name} x${qty} agregado 🌶️`);
+}
+
+function removeFromCart(id) {
+  delete cart[id];
+  updateCartUI();
+}
+
+function updateCartUI() {
+  const ids = Object.keys(cart);
+  const count = ids.reduce((s, id) => s + cart[id].qty, 0);
+  document.getElementById('cart-count').textContent = count;
+
+  const total = ids.reduce((s, id) => s + cart[id].price * cart[id].qty, 0);
+  document.getElementById('cart-total').textContent = `S/${total}.00`;
+
+  const container = document.getElementById('cart-items');
+  if (ids.length === 0) {
+    container.innerHTML = '<div class="cart-empty">¡Tu carrito está vacío!<br>Agrega algo delicioso 🌶️</div>';
+    return;
+  }
+  container.innerHTML = ids.map(id => `
+    <div class="cart-item">
+      <span class="cart-item-name">${cart[id].name}</span>
+      <span class="cart-item-qty">x${cart[id].qty}</span>
+      <span class="cart-item-price">S/${cart[id].price * cart[id].qty}.00</span>
+      <button class="cart-item-remove" onclick="removeFromCart(${id})">🗑️</button>
+    </div>
+  `).join('');
+}
+
+function showTab(tab) {
+  document.querySelectorAll('.menu-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + tab).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function openCart() {
+  document.getElementById('cart-overlay').classList.add('open');
+}
+
+function closeCart() {
+  document.getElementById('cart-overlay').classList.remove('open');
+}
+
+function closeCartOut(e) {
+  if (e.target === document.getElementById('cart-overlay')) closeCart();
+}
+
+function buildOrderText() {
+  const ids = Object.keys(cart);
+  if (ids.length === 0) return null;
+  const lines = ids.map(id => `• ${cart[id].name} x${cart[id].qty} = S/${cart[id].price * cart[id].qty}.00`);
+  const total = ids.reduce((s, id) => s + cart[id].price * cart[id].qty, 0);
+  return lines.join('\n') + `\n\n*TOTAL: S/${total}.00*`;
+}
+
+function sendWhatsApp(type, e) {
+  e.preventDefault();
+  let msg = '';
+  if (type === 'delivery') {
+    const order = buildOrderText();
+    if (!order) {
+      showToast('¡Agrega productos antes de pedir! 🛒');
+      return;
+    }
+    msg = `🌶️ *Hola Ta' Picosito!* Quiero hacer un pedido a *DELIVERY*:\n\n${order}\n\n📍 Por favor indíquenme el costo de envío a mi dirección:   `;
+  } else {
+    msg = `👋 *Hola Ta' Picosito!* Quisiera *consultar información* sobre su menú y disponibilidad. ¡Gracias!`;
+  }
+  const url = `https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+}
+
+function openWhatsApp(e) {
+  e.preventDefault();
+  const order = buildOrderText();
+  let msg;
+  if (order) {
+    msg = `🌶️ *Hola Ta' Picosito!* Quiero hacer un pedido:\n\n${order}`;
+  } else {
+    msg = `👋 *Hola Ta' Picosito!* Quiero consultar información sobre su menú.`;
+  }
+  window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// Init
+buildMenuGrid('elotes');
+buildMenuGrid('botanas');
+buildMenuGrid('frutas');
+buildAddons();
+</script>
+</body>
+</html>
